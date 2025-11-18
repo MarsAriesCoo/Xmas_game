@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>聖誕 51 宮格猜謎系統 🎄</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Microsoft JhengHei", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #145c3a 0, #041b12 55%, #020b07 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #c1121f;
+      text-align: center;
+      padding: 16px 8px;
+      font-size: 30px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.45);
+    }
+    main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 16px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .view {
+      display: none;
+    }
+    .view.active {
+      display: block;
+    }
+    .section-title {
+      font-size: 22px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    /* 51 宮格區 */
+    .grid-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .grid-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: nowrap;
+    }
+    .grid-btn {
+      min-width: 110px;
+      max-width: 140px;
+      padding: 16px 8px;
+      border-radius: 14px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      background: #145c3a;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease;
+      white-space: normal;
+    }
+    .grid-btn:hover {
+      background: #1b7a4e;
+    }
+    .grid-btn:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .grid-btn.used {
+      background: #109674;
+      color: #051510;
+    }
+    .grid-btn.empty {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.45);
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .center-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 18px;
+    }
+    .btn {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease;
+    }
+    .btn:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: none;
+    }
+    .btn-red {
+      background: #c1121f;
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+    }
+    .btn-red:hover {
+      background: #a10e1a;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* 題目頁 */
+    .card {
+      background: rgba(10, 55, 39, 0.96);
+      border-radius: 20px;
+      border: 2px solid #c1121f;
+      padding: 22px 24px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.48);
+      margin-bottom: 18px;
+    }
+    .card-title {
+      font-size: 24px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .question-text {
+      font-size: 24px;
+      line-height: 1.7;
+      text-align: center;
+      white-space: pre-wrap;
+    }
+    .answer-text {
+      font-size: 24px;
+      line-height: 1.7;
+      text-align: center;
+      color: #ffdd33;
+      white-space: pre-wrap;
+    }
+    .hint-text {
+      font-size: 18px;
+      text-align: center;
+      opacity: 0.85;
+    }
+    .qa-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 14px 0 18px;
+      flex-wrap: wrap;
+    }
+
+    /* 新增謎題 Dialog */
+    dialog {
+      border: none;
+      border-radius: 18px;
+      padding: 18px 20px;
+      max-width: 480px;
+      width: 90%;
+      background: #123524;
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    dialog::backdrop {
+      background: rgba(0,0,0,0.6);
+    }
+    .field-group {
+      margin-bottom: 10px;
+    }
+    .field-group label {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .field-group input,
+    .field-group textarea {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #277454;
+      background: #0c291d;
+      color: #fff;
+      resize: vertical;
+      min-height: 80px;
+    }
+    .field-group input {
+      min-height: auto;
+    }
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 18px;
+      padding: 10px 0 16px;
+      color: #ffdd55;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    🎄 聖誕 51 宮格猜謎小劇場 🎅
+  </header>
+
+  <main>
+    <!-- 主頁：51 宮格 -->
+    <section id="homeView" class="view active">
+      <div class="section-title">點選一格進入謎題：</div>
+
+      <div class="grid-wrapper" id="gridWrapper"></div>
+
+      <div class="center-row">
+        <button class="btn btn-red" id="btnAddRiddle">
+          ➕ 新增謎題
+        </button>
+      </div>
+    </section>
+
+    <!-- 題目頁 -->
+    <section id="qaView" class="view">
+      <div class="card">
+        <div class="card-title" id="qaTitle">🎄 謎題內容 🎄</div>
+        <div class="question-text" id="questionText">
+          （請先從 51 宮格選擇一題）
+        </div>
+      </div>
+
+      <div class="qa-controls">
+        <button class="btn btn-red" id="btnShowAnswer">
+          🎁 顯示謎底
+        </button>
+        <button class="btn btn-ghost" id="btnDeleteRiddle">
+          🗑 刪除此題
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎁 謎底 🎁</div>
+        <div class="answer-text" id="answerText">
+          （尚未顯示答案，先和大家猜猜看 😏）
+        </div>
+      </div>
+
+      <div class="center-row">
+        <button class="btn btn-red" id="btnBackHome">
+          ⬅ 回到 51 宮格
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    答對也好，答錯也好，大家一起笑著過聖誕 🎅
+  </footer>
+
+  <!-- 新增謎題 Dialog -->
+  <dialog id="addDialog">
+    <form method="dialog" id="addForm">
+      <h3 style="margin-top:0;margin-bottom:8px;">新增謎題（主辦用）</h3>
+      <div class="field-group">
+        <label for="titleInput">題目標題：</label>
+        <input id="titleInput" type="text" placeholder="例如：第4題／聖誕特別題" />
+      </div>
+      <div class="field-group">
+        <label for="questionInput">謎題內容：</label>
+        <textarea id="questionInput" placeholder="輸入謎題內容"></textarea>
+      </div>
+      <div class="field-group">
+        <label for="answerInput">謎底：</label>
+        <textarea id="answerInput" placeholder="輸入謎底"></textarea>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" type="button" id="btnCancelAdd">取消</button>
+        <button class="btn btn-red" type="submit">加入</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    // ------ 初始資料（可以自行補滿到 51 題） ------
+    const initialRiddles = [
+      {
+        title: "第1題",
+        question: "早上四條腿，中午兩條腿，晚上三條腿，請問是什麼？",
+        answer: "人（嬰兒爬行、成人走路、老人拄杖）",
+        used: false,
+      },
+      {
+        title: "第2題",
+        question: "什麼東西越洗越髒？",
+        answer: "水",
+        used: false,
+      },
+      {
+        title: "第3題",
+        question: "身穿綠衣裳，肚裡水汪汪，生的子兒多，個個黑心腸。是什麼？",
+        answer: "西瓜",
+        used: false,
+      },
+    ];
+
+    const rowLayout = [6, 7, 8, 9, 8, 7, 6];
+    const MAX_SLOTS = rowLayout.reduce((a, b) => a + b, 0); // 51
+
+    const homeView = document.getElementById("homeView");
+    const qaView = document.getElementById("qaView");
+    const gridWrapper = document.getElementById("gridWrapper");
+    const btnAddRiddle = document.getElementById("btnAddRiddle");
+
+    const qaTitle = document.getElementById("qaTitle");
+    const questionText = document.getElementById("questionText");
+    const answerText = document.getElementById("answerText");
+    const btnShowAnswer = document.getElementById("btnShowAnswer");
+    const btnDeleteRiddle = document.getElementById("btnDeleteRiddle");
+    const btnBackHome = document.getElementById("btnBackHome");
+
+    const addDialog = document.getElementById("addDialog");
+    const addForm = document.getElementById("addForm");
+    const titleInput = document.getElementById("titleInput");
+    const questionInput = document.getElementById("questionInput");
+    const answerInput = document.getElementById("answerInput");
+    const btnCancelAdd = document.getElementById("btnCancelAdd");
+
+    let riddles = [...initialRiddles];
+    let selectedIndex = null;
+
+    // ------ View 切換 ------
+    function showHomeView() {
+      homeView.classList.add("active");
+      qaView.classList.remove("active");
+    }
+
+    function showQAView() {
+      qaView.classList.add("active");
+      homeView.classList.remove("active");
+    }
+
+    // ------ 51 宮格繪製 ------
+    function renderGrid() {
+      gridWrapper.innerHTML = "";
+      let idx = 0;
+      const total = riddles.length;
+
+      for (const count of rowLayout) {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "grid-row";
+
+        for (let i = 0; i < count; i++) {
+          const btn = document.createElement("button");
+          btn.className = "grid-btn";
+
+          if (idx < total) {
+            const r = riddles[idx];
+            btn.textContent = r.title || `題目 ${idx + 1}`;
+            if (r.used) {
+              btn.classList.add("used");
+            }
+            btn.addEventListener("click", () => openRiddle(idx));
+          } else {
+            btn.textContent = "（空）";
+            btn.classList.add("empty");
+          }
+
+          rowDiv.appendChild(btn);
+          idx++;
+        }
+        gridWrapper.appendChild(rowDiv);
+      }
+    }
+
+    // ------ 開啟某一題 ------
+    function openRiddle(index) {
+      if (index >= riddles.length) return;
+      selectedIndex = index;
+      const r = riddles[index];
+
+      qaTitle.textContent = r.title || "謎題";
+      questionText.textContent = r.question || "";
+      answerText.textContent = "（尚未顯示答案，先和大家猜猜看 😏）";
+      showQAView();
+    }
+
+    // ------ 顯示謎底 ------
+    function showAnswer() {
+      if (selectedIndex === null || selectedIndex >= riddles.length) {
+        alert("請先從 51 宮格選一題");
+        return;
+      }
+      const r = riddles[selectedIndex];
+      answerText.textContent = r.answer || "";
+
+      // 標記為已使用
+      r.used = true;
+      renderGrid();
+    }
+
+    // ------ 刪除目前題目 ------
+    function deleteCurrentRiddle() {
+      if (selectedIndex === null || selectedIndex >= riddles.length) {
+        alert("目前沒有選中的題目");
+        return;
+      }
+      const r = riddles[selectedIndex];
+      const ok = confirm(`確定要刪除「${r.title || "這一題"}」嗎？`);
+      if (!ok) return;
+
+      riddles.splice(selectedIndex, 1);
+      selectedIndex = null;
+      showHomeView();
+      renderGrid();
+    }
+
+    // ------ 新增謎題 ------
+    function openAddDialog() {
+      if (riddles.length >= MAX_SLOTS) {
+        alert("已達 51 題上限，無法再新增。");
+        return;
+      }
+      titleInput.value = "";
+      questionInput.value = "";
+      answerInput.value = "";
+      addDialog.showModal();
+    }
+
+    addForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = titleInput.value.trim();
+      const question = questionInput.value.trim();
+      const answer = answerInput.value.trim();
+
+      if (!title || !question || !answer) {
+        alert("標題、謎題內容、謎底都要填寫喔！");
+        return;
+      }
+
+      riddles.push({
+        title,
+        question,
+        answer,
+        used: false,
+      });
+
+      addDialog.close();
+      renderGrid();
+    });
+
+    btnCancelAdd.addEventListener("click", () => {
+      addDialog.close();
+    });
+
+    // ------ 綁定事件 ------
+    btnAddRiddle.addEventListener("click", openAddDialog);
+    btnShowAnswer.addEventListener("click", showAnswer);
+    btnDeleteRiddle.addEventListener("click", deleteCurrentRiddle);
+    btnBackHome.addEventListener("click", () => {
+      showHomeView();
+      renderGrid();
+    });
+
+    // 初始顯示
+    renderGrid();
+  </script>
+</body>
+</html>
