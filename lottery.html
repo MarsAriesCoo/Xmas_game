@@ -103,7 +103,7 @@
       box-shadow: 0 3px 10px rgba(0,0,0,0.35);
     }
     .btn-red:hover {
-      background: #a30e1a;
+      background: #a10e1a;
     }
     .btn-ghost {
       background: transparent;
@@ -168,6 +168,7 @@
       text-shadow: 0 0 10px rgba(0,0,0,0.85);
       margin: 6px 0 4px 0;
       min-height: 1.4em;
+      word-break: break-all;
     }
     .result-sub {
       font-size: 16px;
@@ -269,3 +270,111 @@
     const btnAdd = document.getElementById("btnAdd");
     const btnRemove = document.getElementById("btnRemove");
     const btnClear = document.getElementById("btnClear");
+    const btnDraw = document.getElementById("btnDraw");
+    const removeAfterDraw = document.getElementById("removeAfterDraw");
+    const resultMain = document.getElementById("resultMain");
+    const resultSub = document.getElementById("resultSub");
+    const logList = document.getElementById("logList");
+
+    let participants = [];
+    let selectedIndex = null;
+    let drawLog = [];
+
+    function renderList() {
+      listBox.innerHTML = "";
+      participants.forEach((id, index) => {
+        const item = document.createElement("div");
+        item.className = "list-item" + (index === selectedIndex ? " selected" : "");
+        item.innerHTML = `
+          <span>${id}</span>
+          <span class="small-tag">#${index + 1}</span>
+        `;
+        item.addEventListener("click", () => {
+          selectedIndex = index === selectedIndex ? null : index;
+          renderList();
+        });
+        listBox.appendChild(item);
+      });
+      countLabel.textContent = `目前人數：${participants.length}`;
+    }
+
+    function renderLog() {
+      logList.innerHTML = "";
+      if (drawLog.length === 0) {
+        logList.innerHTML = `<div style="opacity:0.8;font-size:14px;">尚無中籤紀錄～</div>`;
+        return;
+      }
+      drawLog.forEach((id, index) => {
+        const row = document.createElement("div");
+        row.className = "log-item";
+        row.innerHTML = `<span>${index + 1}. ${id}</span><span class="small-tag">🎄 Lucky</span>`;
+        logList.appendChild(row);
+      });
+    }
+
+    btnAdd.addEventListener("click", () => {
+      const id = empIdInput.value.trim();
+      if (!id) {
+        alert("請先輸入工號");
+        return;
+      }
+      if (participants.includes(id)) {
+        alert("這個工號已經在名單中");
+        return;
+      }
+      participants.push(id);
+      empIdInput.value = "";
+      selectedIndex = null;
+      renderList();
+    });
+
+    empIdInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        btnAdd.click();
+      }
+    });
+
+    btnRemove.addEventListener("click", () => {
+      if (selectedIndex === null) {
+        alert("請先在名單中選擇要刪除的工號");
+        return;
+      }
+      participants.splice(selectedIndex, 1);
+      selectedIndex = null;
+      renderList();
+    });
+
+    btnClear.addEventListener("click", () => {
+      if (!confirm("確定要清空所有名單嗎？")) return;
+      participants = [];
+      selectedIndex = null;
+      renderList();
+    });
+
+    btnDraw.addEventListener("click", () => {
+      if (participants.length === 0) {
+        alert("名單是空的，無法抽籤");
+        return;
+      }
+      const idx = Math.floor(Math.random() * participants.length);
+      const winner = participants[idx];
+      resultMain.textContent = winner;
+      resultSub.textContent = "恭喜這位幸運的聖誕小夥伴 🎁";
+
+      drawLog.push(winner);
+      renderLog();
+
+      if (removeAfterDraw.checked) {
+        participants.splice(idx, 1);
+        if (selectedIndex !== null && selectedIndex >= participants.length) {
+          selectedIndex = null;
+        }
+        renderList();
+      }
+    });
+
+    renderList();
+    renderLog();
+  </script>
+</body>
+</html>
