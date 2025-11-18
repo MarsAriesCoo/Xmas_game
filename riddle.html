@@ -33,19 +33,13 @@
       flex-direction: column;
       align-items: stretch;
     }
-    .view {
-      display: none;
-    }
-    .view.active {
-      display: block;
-    }
+    .view { display: none; }
+    .view.active { display: block; }
     .section-title {
       font-size: 22px;
       margin-bottom: 10px;
       text-align: center;
     }
-
-    /* 51 宮格區 */
     .grid-wrapper {
       display: flex;
       flex-direction: column;
@@ -74,9 +68,7 @@
       transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease;
       white-space: normal;
     }
-    .grid-btn:hover {
-      background: #1b7a4e;
-    }
+    .grid-btn:hover { background: #1b7a4e; }
     .grid-btn:active {
       transform: translateY(1px) scale(0.97);
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
@@ -91,7 +83,6 @@
       cursor: default;
       box-shadow: none;
     }
-
     .center-row {
       display: flex;
       justify-content: center;
@@ -118,19 +109,14 @@
       color: #fff;
       box-shadow: 0 3px 10px rgba(0,0,0,0.35);
     }
-    .btn-red:hover {
-      background: #a10e1a;
-    }
+    .btn-red:hover { background: #a10e1a; }
     .btn-ghost {
       background: transparent;
       color: #fff;
       border: 1px solid rgba(255,255,255,0.4);
     }
-    .btn-ghost:hover {
-      background: rgba(255,255,255,0.08);
-    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); }
 
-    /* 題目頁 */
     .card {
       background: rgba(10, 55, 39, 0.96);
       border-radius: 20px;
@@ -144,24 +130,14 @@
       margin-bottom: 16px;
       text-align: center;
     }
-    .question-text {
-      font-size: 24px;
-      line-height: 1.7;
-      text-align: center;
-      white-space: pre-wrap;
-    }
+    .question-text,
     .answer-text {
       font-size: 24px;
       line-height: 1.7;
       text-align: center;
-      color: #ffdd33;
       white-space: pre-wrap;
     }
-    .hint-text {
-      font-size: 18px;
-      text-align: center;
-      opacity: 0.85;
-    }
+    .answer-text { color: #ffdd33; }
     .qa-controls {
       display: flex;
       justify-content: center;
@@ -169,8 +145,6 @@
       margin: 14px 0 18px;
       flex-wrap: wrap;
     }
-
-    /* 新增謎題 Dialog */
     dialog {
       border: none;
       border-radius: 18px;
@@ -181,12 +155,8 @@
       color: #fff;
       box-shadow: 0 10px 30px rgba(0,0,0,0.6);
     }
-    dialog::backdrop {
-      background: rgba(0,0,0,0.6);
-    }
-    .field-group {
-      margin-bottom: 10px;
-    }
+    dialog::backdrop { background: rgba(0,0,0,0.6); }
+    .field-group { margin-bottom: 10px; }
     .field-group label {
       font-size: 16px;
       display: block;
@@ -204,16 +174,13 @@
       resize: vertical;
       min-height: 80px;
     }
-    .field-group input {
-      min-height: auto;
-    }
+    .field-group input { min-height: auto; }
     .dialog-actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
       margin-top: 10px;
     }
-
     footer {
       text-align: center;
       font-size: 18px;
@@ -231,13 +198,9 @@
     <!-- 主頁：51 宮格 -->
     <section id="homeView" class="view active">
       <div class="section-title">點選一格進入謎題：</div>
-
       <div class="grid-wrapper" id="gridWrapper"></div>
-
       <div class="center-row">
-        <button class="btn btn-red" id="btnAddRiddle">
-          ➕ 新增謎題
-        </button>
+        <button class="btn btn-red" id="btnAddRiddle">➕ 新增謎題</button>
       </div>
     </section>
 
@@ -245,31 +208,21 @@
     <section id="qaView" class="view">
       <div class="card">
         <div class="card-title" id="qaTitle">🎄 謎題內容 🎄</div>
-        <div class="question-text" id="questionText">
-          （請先從 51 宮格選擇一題）
-        </div>
+        <div class="question-text" id="questionText">（請先從 51 宮格選擇一題）</div>
       </div>
 
       <div class="qa-controls">
-        <button class="btn btn-red" id="btnShowAnswer">
-          🎁 顯示謎底
-        </button>
-        <button class="btn btn-ghost" id="btnDeleteRiddle">
-          🗑 刪除此題
-        </button>
+        <button class="btn btn-red" id="btnShowAnswer">🎁 顯示謎底</button>
+        <button class="btn btn-ghost" id="btnDeleteRiddle">🗑 刪除此題</button>
       </div>
 
       <div class="card">
         <div class="card-title">🎁 謎底 🎁</div>
-        <div class="answer-text" id="answerText">
-          （尚未顯示答案，先和大家猜猜看 😏）
-        </div>
+        <div class="answer-text" id="answerText">（尚未顯示答案，先和大家猜猜看 😏）</div>
       </div>
 
       <div class="center-row">
-        <button class="btn btn-red" id="btnBackHome">
-          ⬅ 回到 51 宮格
-        </button>
+        <button class="btn btn-red" id="btnBackHome">⬅ 回到 51 宮格</button>
       </div>
     </section>
   </main>
@@ -302,7 +255,6 @@
   </dialog>
 
   <script>
-    // ------ 初始資料（可以自行補滿到 51 題） ------
     const initialRiddles = [
       {
         title: "第1題",
@@ -325,7 +277,7 @@
     ];
 
     const rowLayout = [6, 7, 8, 9, 8, 7, 6];
-    const MAX_SLOTS = rowLayout.reduce((a, b) => a + b, 0); // 51
+    const MAX_SLOTS = rowLayout.reduce((a, b) => a + b, 0);
 
     const homeView = document.getElementById("homeView");
     const qaView = document.getElementById("qaView");
@@ -349,7 +301,6 @@
     let riddles = [...initialRiddles];
     let selectedIndex = null;
 
-    // ------ View 切換 ------
     function showHomeView() {
       homeView.classList.add("active");
       qaView.classList.remove("active");
@@ -360,7 +311,6 @@
       homeView.classList.remove("active");
     }
 
-    // ------ 51 宮格繪製 ------
     function renderGrid() {
       gridWrapper.innerHTML = "";
       let idx = 0;
@@ -377,9 +327,7 @@
           if (idx < total) {
             const r = riddles[idx];
             btn.textContent = r.title || `題目 ${idx + 1}`;
-            if (r.used) {
-              btn.classList.add("used");
-            }
+            if (r.used) btn.classList.add("used");
             btn.addEventListener("click", () => openRiddle(idx));
           } else {
             btn.textContent = "（空）";
@@ -393,7 +341,6 @@
       }
     }
 
-    // ------ 開啟某一題 ------
     function openRiddle(index) {
       if (index >= riddles.length) return;
       selectedIndex = index;
@@ -405,7 +352,6 @@
       showQAView();
     }
 
-    // ------ 顯示謎底 ------
     function showAnswer() {
       if (selectedIndex === null || selectedIndex >= riddles.length) {
         alert("請先從 51 宮格選一題");
@@ -413,13 +359,10 @@
       }
       const r = riddles[selectedIndex];
       answerText.textContent = r.answer || "";
-
-      // 標記為已使用
       r.used = true;
       renderGrid();
     }
 
-    // ------ 刪除目前題目 ------
     function deleteCurrentRiddle() {
       if (selectedIndex === null || selectedIndex >= riddles.length) {
         alert("目前沒有選中的題目");
@@ -435,7 +378,6 @@
       renderGrid();
     }
 
-    // ------ 新增謎題 ------
     function openAddDialog() {
       if (riddles.length >= MAX_SLOTS) {
         alert("已達 51 題上限，無法再新增。");
@@ -458,22 +400,13 @@
         return;
       }
 
-      riddles.push({
-        title,
-        question,
-        answer,
-        used: false,
-      });
-
+      riddles.push({ title, question, answer, used: false });
       addDialog.close();
       renderGrid();
     });
 
-    btnCancelAdd.addEventListener("click", () => {
-      addDialog.close();
-    });
+    btnCancelAdd.addEventListener("click", () => addDialog.close());
 
-    // ------ 綁定事件 ------
     btnAddRiddle.addEventListener("click", openAddDialog);
     btnShowAnswer.addEventListener("click", showAnswer);
     btnDeleteRiddle.addEventListener("click", deleteCurrentRiddle);
@@ -482,7 +415,6 @@
       renderGrid();
     });
 
-    // 初始顯示
     renderGrid();
   </script>
 </body>
